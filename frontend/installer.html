@@ -6,7 +6,16 @@
   <title>Sumibi Installer</title>
   <!-- 外部CSSファイルの読み込み -->
   <link rel="stylesheet" href="installer.css">
+  <!-- PyScriptの読み込み -->
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+  
+  <!-- PyScript設定 -->
+  <py-config>
+    packages = ["yt-dlp", "ssl"]
+  </py-config>
 </head>
+
 <body>
   <!-- メインコンテナ -->
   <div class="container">
@@ -16,7 +25,7 @@
     <!-- URL入力とダウンロードボタンのセクション -->
     <div class="input-section">
       <input type="url" id="urlInput" placeholder="ダウンロードするファイルのURLを入力してください" />
-      <button id="downloadBtn" onclick="downloadFile()">ダウンロード</button>
+      <button id="downloadBtn">ダウンロード</button>
     </div>
     
     <!-- オプション設定のセクション（横並び） -->
@@ -45,89 +54,70 @@
       
       <!-- 設定保存ボタン -->
       <div class="settings-section">
-        <button class="settings-btn" onclick="setDownloadSettings()">ダウンロードファイルを設定</button>
+        <button class="settings-btn">ダウンロードファイルを設定</button>
       </div>
     </div>
   </div>
-
-  <script>
-    // メイン機能：ダウンロード処理
-    function downloadFile() {
-      // DOM要素の取得
-      const urlInput = document.getElementById('urlInput');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const qualitySelect = document.getElementById('qualitySelect');
-      const thumbnailCheck = document.getElementById('thumbnailCheck');
-      
-      // 入力値の取得
-      const url = urlInput.value.trim();
-      const quality = qualitySelect.value;
-      const includeThumbnail = thumbnailCheck.checked;
-      
-      // バリデーション：URL入力チェック
-      if (!url) {
-        alert('URLを入力してください');
-        return;
-      }
-      
-      // バリデーション：URL形式チェック
-      if (!isValidUrl(url)) {
-        alert('有効なURLを入力してください');
-        return;
-      }
-      
-      // ボタンの無効化とテキスト変更
-      downloadBtn.disabled = true;
-      downloadBtn.textContent = 'ダウンロード中...';
-      
-      // TODO: バックエンドのdownloader.pyと連携する処理を実装
-      console.log('ダウンロード開始:', {
-        url: url,
-        quality: quality,
-        thumbnail: includeThumbnail
-      });
-      
-      // 仮の処理（実際はバックエンドとの通信が必要）
-      setTimeout(() => {
-        downloadBtn.disabled = false;
-        downloadBtn.textContent = 'ダウンロード';
-        alert('ダウンロードが完了しました');
-      }, 2000);
-    }
+  <!-- PyScriptのスクリプト -->
+  <py-script>
+    # 必要なモジュールをインポート
+    from pyscript import document  # HTMLのDOM操作用
+    from js import console         # ブラウザのコンソール出力用
+    import asyncio                 # 非同期処理用
     
-    // ユーティリティ関数：URL形式の検証
-    function isValidUrl(string) {
-      try {
-        new URL(string);
-        return true;
-      } catch (_) {
-        return false;
-      }
-    }
+    # 非同期関数：必要なパッケージをセットアップ
+    async def setup_imports():
+        try:
+            # micropip（PyScriptのパッケージマネージャー）をインポート
+            import micropip
+            
+            # SSLパッケージをインストール（yt_dlpに必要）
+            await micropip.install("ssl")
+            
+            # yt_dlp（動画ダウンロードライブラリ）をインポート
+            import yt_dlp
+            console.log("yt_dlp imported successfully!")  # コンソールに成功メッセージ
+            print("yt_dlp is available")                   # ページ上に成功メッセージ
+            
+            # ダウンローダーのセットアップを実行
+            await setup_downloader()
+            
+        except Exception as e:
+            # エラーが発生した場合の処理
+            console.log(f"Setup error: {e}")  # コンソールにエラー表示
+            print(f"Setup error: {e}")        # ページ上にエラー表示
     
-    // 設定保存機能
-    function setDownloadSettings() {
-      // 現在の設定値を取得
-      const qualitySelect = document.getElementById('qualitySelect');
-      const thumbnailCheck = document.getElementById('thumbnailCheck');
-      
-      const settings = {
-        quality: qualitySelect.value,
-        thumbnail: thumbnailCheck.checked
-      };
-      
-      // 設定をコンソールに出力（デバッグ用）
-      console.log('ダウンロード設定:', settings);
-      // ユーザーに設定内容を表示
-      alert(`設定が保存されました\n品質: ${qualitySelect.options[qualitySelect.selectedIndex].text}\nサムネイル: ${thumbnailCheck.checked ? '有効' : '無効'}`);
-    }
+    # 非同期関数：ダウンロード機能のセットアップ
+    async def setup_downloader():
+        # ダウンロードボタンがクリックされた時の処理を定義
+        def download_handler(event):
+            console.log("Download button clicked!")  # クリック確認メッセージ
+            
+            # HTMLフォームから値を取得
+            url = document.querySelector("#urlInput").value        # URL入力フィールドの値
+            quality = document.querySelector("#qualitySelect").value  # 品質選択の値
+            thumbnail = document.querySelector("#thumbnailCheck").checked  # サムネチェックボックスの状態
+            
+            # 取得した値をコンソールとページに表示
+            console.log(f"URL: {url}, Quality: {quality}, Thumbnail: {thumbnail}")
+            print(f"ダウンロード設定 - URL: {url}, 品質: {quality}, サムネ: {thumbnail}")
+            
+            # TODO: ここに実際のyt_dlpを使ったダウンロード処理を追加予定
+        
+        # HTMLのダウンロードボタンを取得
+        download_btn = document.querySelector("#downloadBtn")
+        # ボタンにクリックイベントハンドラーを設定
+        download_btn.onclick = download_handler
+        
+        console.log("Downloader setup complete!")  # セットアップ完了メッセージ
     
-    // イベントリスナー：Enterキーでダウンロード実行
-    document.getElementById('urlInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        downloadFile();
-      }
-    });
-  </script>
+    # プログラム開始：非同期でセットアップを実行
+    # （create_taskでバックグラウンドで実行し、メインスレッドをブロックしない）
+    asyncio.create_task(setup_imports())
+    
+    # PyScriptが正常に動作していることを確認するためのメッセージ
+    console.log("PyScript is working!")      # コンソールに表示
+    print("This should appear on the page")  # ページ上に表示
+  </py-script>
 </body>
 </html>
