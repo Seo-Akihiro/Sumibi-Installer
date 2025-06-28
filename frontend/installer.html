@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sumibi Installer</title>
-  <!-- 外部CSSファイルの読み込み -->
   <link rel="stylesheet" href="installer.css">
 </head>
 
@@ -25,18 +24,18 @@
     <!-- オプション設定のセクション（横並び） -->
     <div class="options-section">
       <!-- 品質選択プルダウン -->
-      <div class="quality-section">
-        <label for="qualitySelect">オプション</label>
-        <select id="qualitySelect">
-          <option value="best">最高画質</option>
-          <option value="audio">音声のみ</option>
-          <option value="720">720</option>
-          <option value="480">480</option>
-          <option value="360">360</option>
-          <option value="240">240</option>
-          <option value="144">144</option>
-        </select>
-      </div>
+     <div class="quality-section">
+  <label for="qualitySelect">品質</label>
+  <select id="qualitySelect">
+    <option value="best">最高画質</option>
+    <option value="bestaudio/best">音声のみ</option>
+    <option value="best[height<=720]">720p</option>
+    <option value="best[height<=480]">480p</option>
+    <option value="best[height<=360]">360p</option>
+    <option value="best[height<=240]">240p</option>
+    <option value="best[height<=144]">144p</option>
+  </select>
+</div>
       
       <!-- サムネイル出力のチェックボックス -->
       <div class="checkbox-section">
@@ -46,10 +45,26 @@
         </div>
       </div>
       
-      <!-- 設定保存ボタン -->
+      <!--ダウンロードファイル設定ボタン -->
       <div class="settings-section">
-        <button class="settings-btn">ダウンロードファイルを設定</button>
+        <button class="settings-btn" id="settingsBtn">ダウンロードファイルを設定</button>
+        <!-- 隠しフォルダ選択 -->
+        <input type="file" id="folderInput" webkitdirectory style="display: none;">
       </div>
+    </div>
+
+    <!-- ダウンロード先表示エリアを追加 -->
+    <div class="download-path-section" id="downloadPathSection">
+      <label for="downloadPath">保存先:</label>
+      <input type="text" id="downloadPath" placeholder="保存先フォルダを選択してください" readonly>
+      <small id="pathNote">※「ダウンロードファイルを設定」ボタンでフォルダを選択できます</small>
+    </div>
+
+    <!-- 結果表示エリア -->
+    <div class="result-section" id="resultSection" style="display: none;">
+      <h3>ダウンロード結果</h3>
+      <div id="resultMessage" class="result-message"></div>
+      <div id="resultDetails" class="result-details"></div>
     </div>
   </div>
 </body>

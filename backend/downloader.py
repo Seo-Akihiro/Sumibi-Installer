@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
 import yt_dlp
 
 app = Flask(__name__)
+CORS(app)  # シンプルなCORS設定に変更
 
 @app.route('/')
 def hello():
@@ -17,13 +20,35 @@ def double_number():
 @app.route('/api/download', methods=['POST'])
 def download_video():
   #リクエストを受け取る
-  date = request.get_json()
+  data = request.get_json()
 
   #リクエストからデータを受け取り
-  url = date.get('url', 'https://www.youtube.com/watch?v=jNQXAC9IVRw')
-  path = date.get('save_path', './downloads')
-  format = date.get('format', 'best')
-  writethumbnail = date.get('writethumbnail', False)
+  url = data.get('url', 'https://www.youtube.com/watch?v=jNQXAC9IVRw')
+  custom_path = data.get('save_path')
+  format = data.get('format', 'best')
+  writethumbnail = data.get('writethumbnail', False)
+
+  # パス処理を改善
+  if custom_path and custom_path.strip():
+    # カスタムパスが指定されている場合
+    if custom_path.startswith('~'):
+      # チルダ記号を展開
+      path = os.path.expanduser(custom_path)
+    else:
+      # 相対パスまたは絶対パス
+      path = os.path.abspath(custom_path)
+    
+    # フォルダが存在しない場合は作成
+    try:
+      os.makedirs(path, exist_ok=True)
+    except Exception as e:
+      return jsonify({
+        'status': 'error', 
+        'message': f'フォルダの作成に失敗しました: {str(e)}'
+      })
+  else:
+    # デフォルトパス
+    path = os.path.expanduser('~/Downloads')
 
   #オプションの設定
   opts = {
@@ -37,27 +62,19 @@ def download_video():
   }
 
   #ダウンロードの実行
-  with yt_dlp.YoutubeDL(opts) as ydl:
-    ydl.download([url])
-    
-    return jsonify({'status': 'success', 'message': 'Video downloaded successfully'})
-
-
+  try:
+    with yt_dlp.YoutubeDL(opts) as ydl:
+      ydl.download([url])
+    return jsonify({
+      'status': 'success', 
+      'message': 'Video downloaded successfully',
+      'save_path': path
+    })
+  except Exception as e:
+    return jsonify({
+      'status': 'error', 
+      'message': f'ダウンロードエラー: {str(e)}'
+    })
 
 if __name__ == '__main__':
   app.run(debug=True, host='127.0.0.1', port=5000)
-
-#
-#URL = input("動画のURLを入力: ")
-#
-#print("ダウンロードを開始します...")
-#
-#opts = {
-#        'outtmpl': '%(title)s.%(ext)s',  # ファイル名
-#        'format': 'best',                # 品質
-#        'nocheckcertificate': True,      # SSL証明書の検証をスキップ
-#        'writethumbnail': True,          # サムネイルをダウンロード
-#        'writeall_thumbnails': True,     # 利用可能な全サムネイルをダウンロード
-#        }
-#with yt_dlp.YoutubeDL(opts) as ydl:
-#        ydl.download([URL])

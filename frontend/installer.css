@@ -135,3 +135,51 @@ select:focus {
 .settings-btn:hover {
   background-color: #1976D2;
 }
+
+/* 結果表示エリア */
+.result-section {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.result-section h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.result-message {
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.result-message.loading {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.result-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.result-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.result-details {
+  font-size: 14px;
+  color: #666;
+}
+
+.result-details p {
+  margin: 5px 0;
+}
