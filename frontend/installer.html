@@ -6,17 +6,11 @@
   <title>Sumibi Installer</title>
   <!-- 外部CSSファイルの読み込み -->
   <link rel="stylesheet" href="installer.css">
-  <!-- PyScriptの読み込み -->
-  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-  
-  <!-- PyScript設定 -->
-  <py-config>
-    packages = ["yt-dlp", "ssl"]
-  </py-config>
 </head>
 
-<body>
+<body> 
+  <script src="installer.js"></script>
+
   <!-- メインコンテナ -->
   <div class="container">
     <!-- ページタイトル -->
@@ -58,66 +52,5 @@
       </div>
     </div>
   </div>
-  <!-- PyScriptのスクリプト -->
-  <py-script>
-    # 必要なモジュールをインポート
-    from pyscript import document  # HTMLのDOM操作用
-    from js import console         # ブラウザのコンソール出力用
-    import asyncio                 # 非同期処理用
-    
-    # 非同期関数：必要なパッケージをセットアップ
-    async def setup_imports():
-        try:
-            # micropip（PyScriptのパッケージマネージャー）をインポート
-            import micropip
-            
-            # SSLパッケージをインストール（yt_dlpに必要）
-            await micropip.install("ssl")
-            
-            # yt_dlp（動画ダウンロードライブラリ）をインポート
-            import yt_dlp
-            console.log("yt_dlp imported successfully!")  # コンソールに成功メッセージ
-            print("yt_dlp is available")                   # ページ上に成功メッセージ
-            
-            # ダウンローダーのセットアップを実行
-            await setup_downloader()
-            
-        except Exception as e:
-            # エラーが発生した場合の処理
-            console.log(f"Setup error: {e}")  # コンソールにエラー表示
-            print(f"Setup error: {e}")        # ページ上にエラー表示
-    
-    # 非同期関数：ダウンロード機能のセットアップ
-    async def setup_downloader():
-        # ダウンロードボタンがクリックされた時の処理を定義
-        def download_handler(event):
-            console.log("Download button clicked!")  # クリック確認メッセージ
-            
-            # HTMLフォームから値を取得
-            url = document.querySelector("#urlInput").value        # URL入力フィールドの値
-            quality = document.querySelector("#qualitySelect").value  # 品質選択の値
-            thumbnail = document.querySelector("#thumbnailCheck").checked  # サムネチェックボックスの状態
-            
-            # 取得した値をコンソールとページに表示
-            console.log(f"URL: {url}, Quality: {quality}, Thumbnail: {thumbnail}")
-            print(f"ダウンロード設定 - URL: {url}, 品質: {quality}, サムネ: {thumbnail}")
-            
-            # TODO: ここに実際のyt_dlpを使ったダウンロード処理を追加予定
-        
-        # HTMLのダウンロードボタンを取得
-        download_btn = document.querySelector("#downloadBtn")
-        # ボタンにクリックイベントハンドラーを設定
-        download_btn.onclick = download_handler
-        
-        console.log("Downloader setup complete!")  # セットアップ完了メッセージ
-    
-    # プログラム開始：非同期でセットアップを実行
-    # （create_taskでバックグラウンドで実行し、メインスレッドをブロックしない）
-    asyncio.create_task(setup_imports())
-    
-    # PyScriptが正常に動作していることを確認するためのメッセージ
-    console.log("PyScript is working!")      # コンソールに表示
-    print("This should appear on the page")  # ページ上に表示
-  </py-script>
 </body>
 </html>
