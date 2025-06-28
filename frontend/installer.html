@@ -4,8 +4,130 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sumibi Installer</title>
+  <!-- 外部CSSファイルの読み込み -->
+  <link rel="stylesheet" href="installer.css">
 </head>
 <body>
-  
+  <!-- メインコンテナ -->
+  <div class="container">
+    <!-- ページタイトル -->
+    <h1>Sumibi Installer</h1>
+    
+    <!-- URL入力とダウンロードボタンのセクション -->
+    <div class="input-section">
+      <input type="url" id="urlInput" placeholder="ダウンロードするファイルのURLを入力してください" />
+      <button id="downloadBtn" onclick="downloadFile()">ダウンロード</button>
+    </div>
+    
+    <!-- オプション設定のセクション（横並び） -->
+    <div class="options-section">
+      <!-- 品質選択プルダウン -->
+      <div class="quality-section">
+        <label for="qualitySelect">オプション</label>
+        <select id="qualitySelect">
+          <option value="best">最高画質</option>
+          <option value="audio">音声のみ</option>
+          <option value="720">720</option>
+          <option value="480">480</option>
+          <option value="360">360</option>
+          <option value="240">240</option>
+          <option value="144">144</option>
+        </select>
+      </div>
+      
+      <!-- サムネイル出力のチェックボックス -->
+      <div class="checkbox-section">
+        <div class="checkbox-container">
+          <input type="checkbox" id="thumbnailCheck">
+          <label for="thumbnailCheck">サムネ</label>
+        </div>
+      </div>
+      
+      <!-- 設定保存ボタン -->
+      <div class="settings-section">
+        <button class="settings-btn" onclick="setDownloadSettings()">ダウンロードファイルを設定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // メイン機能：ダウンロード処理
+    function downloadFile() {
+      // DOM要素の取得
+      const urlInput = document.getElementById('urlInput');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const qualitySelect = document.getElementById('qualitySelect');
+      const thumbnailCheck = document.getElementById('thumbnailCheck');
+      
+      // 入力値の取得
+      const url = urlInput.value.trim();
+      const quality = qualitySelect.value;
+      const includeThumbnail = thumbnailCheck.checked;
+      
+      // バリデーション：URL入力チェック
+      if (!url) {
+        alert('URLを入力してください');
+        return;
+      }
+      
+      // バリデーション：URL形式チェック
+      if (!isValidUrl(url)) {
+        alert('有効なURLを入力してください');
+        return;
+      }
+      
+      // ボタンの無効化とテキスト変更
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = 'ダウンロード中...';
+      
+      // TODO: バックエンドのdownloader.pyと連携する処理を実装
+      console.log('ダウンロード開始:', {
+        url: url,
+        quality: quality,
+        thumbnail: includeThumbnail
+      });
+      
+      // 仮の処理（実際はバックエンドとの通信が必要）
+      setTimeout(() => {
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = 'ダウンロード';
+        alert('ダウンロードが完了しました');
+      }, 2000);
+    }
+    
+    // ユーティリティ関数：URL形式の検証
+    function isValidUrl(string) {
+      try {
+        new URL(string);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    
+    // 設定保存機能
+    function setDownloadSettings() {
+      // 現在の設定値を取得
+      const qualitySelect = document.getElementById('qualitySelect');
+      const thumbnailCheck = document.getElementById('thumbnailCheck');
+      
+      const settings = {
+        quality: qualitySelect.value,
+        thumbnail: thumbnailCheck.checked
+      };
+      
+      // 設定をコンソールに出力（デバッグ用）
+      console.log('ダウンロード設定:', settings);
+      // ユーザーに設定内容を表示
+      alert(`設定が保存されました\n品質: ${qualitySelect.options[qualitySelect.selectedIndex].text}\nサムネイル: ${thumbnailCheck.checked ? '有効' : '無効'}`);
+    }
+    
+    // イベントリスナー：Enterキーでダウンロード実行
+    document.getElementById('urlInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        downloadFile();
+      }
+    });
+  </script>
 </body>
 </html>

@@ -8,6 +8,8 @@ opts = {
         'outtmpl': '%(title)s.%(ext)s',  # ファイル名
         'format': 'best',                # 品質
         'nocheckcertificate': True,      # SSL証明書の検証をスキップ
+        'writethumbnail': True,          # サムネイルをダウンロード
+        'writeall_thumbnails': True,     # 利用可能な全サムネイルをダウンロード
         }
 with yt_dlp.YoutubeDL(opts) as ydl:
         ydl.download([URL])
