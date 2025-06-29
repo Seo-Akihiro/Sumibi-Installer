@@ -1,0 +1,4 @@
+炭火インストーラー
+1使い方backendにあるdownloader.pyを起動
+2.HTMLファイルを開き、そこでURLを指定し、ダウンロード
+3.使い終わったらdownloader.pyを修了
