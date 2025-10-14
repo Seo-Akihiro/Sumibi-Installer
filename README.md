@@ -4,6 +4,8 @@
 対応サイトはyt_dlpのサポートサイトまで<br>
 https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md
 
+#### 使用するにはPythonが必須です
+
 ## 初回セットアップ
 
 ### 必要な依存関係のインストール
@@ -22,6 +24,13 @@ pip install flask flask-cors yt-dlp
 ## 使い方
 
 ### 1. バックエンドサーバーの起動
+ダブルクリックで起動する方法と <br>
+コマンドで起動する方法があります
+
+#### ダブルクリックで起動する方法
+backendディレクトリにあるRunCommandをダブルクリックで開けます
+
+#### コマンドで起動する方法
 
 ```bash
 python backend/downloader.py
