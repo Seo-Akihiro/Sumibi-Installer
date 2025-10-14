@@ -25,7 +25,7 @@ def download_video():
   #リクエストからデータを受け取り
   url = data.get('url', 'https://www.youtube.com/watch?v=jNQXAC9IVRw')
   custom_path = data.get('save_path')
-  format = data.get('format', 'best')
+  requested_format = data.get('format', 'best')
   writethumbnail = data.get('writethumbnail', False)
 
   # パス処理を改善
@@ -50,25 +50,47 @@ def download_video():
     # デフォルトパス
     path = os.path.expanduser('~/Downloads')
 
+  is_wav_request = isinstance(requested_format, str) and requested_format.lower() == 'wav'
+
   #オプションの設定
   opts = {
         'outtmpl': f'{path}/%(title)s.%(ext)s', # ファイル名
-        'format': format,                       # 品質
         'nocheckcertificate': True,             # SSL証明書の検証をスキップ
-        'writethumbnail': writethumbnail,       # サムネイルをダウンロード
         'writeall_thumbnails': False,           # 利用可能な全サムネイルをダウンロード
-        'embedthumbnail': True,                 # サムネイルを動画ファイルに埋め込み
         'noplaylist': False                     # プレイリストを無視
   }
+
+  if is_wav_request:
+    opts.update({
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'wav',
+            'preferredquality': '0'
+        }],
+        'postprocessor_args': ['-ar', '48000'],
+        'keepvideo': False,
+        'prefer_ffmpeg': True,
+        'embedthumbnail': False,
+        'writethumbnail': False
+    })
+  else:
+    opts.update({
+        'format': requested_format,
+        'writethumbnail': writethumbnail,
+        'embedthumbnail': writethumbnail
+    })
 
   #ダウンロードの実行
   try:
     with yt_dlp.YoutubeDL(opts) as ydl:
       ydl.download([url])
+    download_label = 'WAV audio' if is_wav_request else 'Video'
     return jsonify({
       'status': 'success', 
-      'message': 'Video downloaded successfully',
-      'save_path': path
+      'message': f'{download_label} downloaded successfully',
+      'save_path': path,
+      'requested_format': 'wav' if is_wav_request else requested_format
     })
   except Exception as e:
     return jsonify({

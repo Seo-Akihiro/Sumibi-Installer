@@ -121,6 +121,16 @@ select:focus {
   color: #333;
 }
 
+.checkbox-container.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-container.disabled label,
+.checkbox-container.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+}
+
 .settings-section {
   flex-shrink: 0;
 }
